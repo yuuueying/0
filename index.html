@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谢小破站 - 心情分享</title>
+    <style>
+        :root {
+            --primary-color: #1877f2;
+            --hover-color: #166fe5;
+            --background-color: #f0f2f5;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--background-color);
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+
+        .post-form {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .post-form:hover {
+            transform: translateY(-2px);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #444;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            transition: border-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .options-group {
+            margin: 15px 0;
+        }
+
+        .options-group p {
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .radio-label:hover {
+            border-color: var(--primary-color);
+            background: #f8f9fa;
+        }
+
+        .radio-label input {
+            margin-right: 8px;
+            width: auto;
+        }
+
+        .post {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .post:hover {
+            transform: translateY(-2px);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            font-size: 28px;
+        }
+
+        .post-author {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .post-mood {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .post-content {
+            margin: 15px 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .post-time {
+            color: #666;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        .post-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .action-button:hover {
+            background-color: #f0f2f5;
+            color: var(--primary-color);
+        }
+
+        .button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+
+        .button:hover {
+            background: var(--hover-color);
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .post-header {
+                flex-wrap: wrap;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* 暗黑主题支持 */
+        [data-theme="dark"] {
+            --background-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-background: #2d2d2d;
+            --border-color: #404040;
+            --hover-background: #353535;
+        }
+
+        [data-theme="dark"] .post-form,
+        [data-theme="dark"] .post,
+        [data-theme="dark"] .no-posts {
+            background: var(--card-background);
+            color: var(--text-color);
+        }
+
+        [data-theme="dark"] input,
+        [data-theme="dark"] textarea {
+            background: var(--card-background);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        /* 头部样式 */
+        .header-content {
+            text-align: center;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .icon-button:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            flex-grow: 1;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* 过滤器样式 */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 5px;
+        }
+
+        .filter-button {
+            background: none;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .filter-button:hover,
+        .filter-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 评论区样式 */
+        .comments-section {
+            margin-top: 15px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .comments-list {
+            margin-bottom: 15px;
+        }
+
+        .comment {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comment-author {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+        .delete-button {
+            color: #dc3545;
+        }
+
+        .delete-button:hover {
+            background-color: #dc354520;
+        }
+
+        .no-posts {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            background: white;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>谢小破站</h1>
+            <p>分享你的每一刻心情</p>
+        </div>
+        <div class="header-controls">
+            <button id="themeToggle" class="icon-button">🌓</button>
+            <button id="notificationToggle" class="icon-button">🔔</button>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="搜索..." class="search-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="filters">
+        <button class="filter-button active" data-filter="all">全部</button>
+        <button class="filter-button" data-filter="today">今天</button>
+        <button class="filter-button" data-filter="week">本周</button>
+        <button class="filter-button" data-filter="hot">热门</button>
+    </div>
+
+    <div class="post-form">
+        <div class="input-group">
+            <label for="authorName">你的名字</label>
+            <input type="text" id="authorName" placeholder="请输入你的名字" maxlength="20">
+        </div>
+
+        <div class="options-group">
+            <p>选择头像</p>
+            <div class="radio-group" id="avatarOptions">
+                <!-- 将由 JavaScript 动态生成 -->
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="content">分享内容</label>
+            <textarea id="content" placeholder="今天想说点什么..." maxlength="500"></textarea>
+            <div id="charCount" class="error"></div>
+        </div>
+
+        <div class="options-group">
+            <p>当前心情</p>
+            <div class="radio-group" id="moodOptions">
+                <!-- 将由 JavaScript 动态生成 -->
+            </div>
+        </div>
+
+        <button id="postButton" class="button">发布</button>
+    </div>
+
+    <div id="postsContainer"></div>
+
+    <script>
+        // 配置
+        const CONFIG = {
+            avatars: [
+                '😊', '🐱', '🐼', '🦊', '🦄', '🤖',
+                '👻', '🌚', '🤡', '👾', '🎭', '🥸',
+                '🦹', '🧙', '🥷', '👺', '🪿', '🦩'
+            ],
+            moods: [
+                {emoji: '😄', name: '开心', color: '#FFD700'},
+                {emoji: '😌', name: '放松', color: '#98FB98'},
+                {emoji: '😢', name: '难过', color: '#87CEEB'},
+                {emoji: '🤔', name: '思考人生', color: '#DDA0DD'},
+                {emoji: '🥹', name: '破防了', color: '#FFB6C1'},
+                {emoji: '🫠', name: '生无可恋', color: '#A0522D'},
+                {emoji: '🌚', name: '黑化了', color: '#4B0082'},
+                {emoji: '🤪', name: '梦游中', color: '#FF69B4'},
+                {emoji: '🥳', name: '快乐加倍', color: '#FF7F50'},
+                {emoji: '🫡', name: '听候差遣', color: '#20B2AA'},
+                {emoji: '🆘', name: '在线求助', color: '#DC143C'},
+                {emoji: '🧊', name: '心如冰窖', color: '#87CEEB'},
+                {emoji: '💫', name: '头晕目眩', color: '#9370DB'},
+                {emoji: '🎭', name: '喜怒无常', color: '#483D8B'},
+                {emoji: '💭', name: '脑洞大开', color: '#B8860B'},
+            ],
+            maxContentLength: 500,
+            maxNameLength: 20,
+            storageKey: 'mood_posts',
+            userPrefsKey: 'user_prefs',
+            defaultTheme: 'light',
+            maxCommentLength: 200
+        };
+
+        class PostManager {
+            constructor() {
+                this.posts = [];
+                this.currentUser = null;
+                this.loadPosts();
+                this.setupEventListeners();
+                this.loadUserPreferences();
+            }
+
+            loadPosts() {
+                try {
+                    const savedPosts = localStorage.getItem(CONFIG.storageKey);
+                    this.posts = savedPosts ? JSON.parse(savedPosts) : [];
+                    this.displayPosts();
+                } catch (e) {
+                    console.error('读取存储的帖子失败:', e);
+                    this.showError('读取历史数据失败');
+                }
+            }
+
+            savePosts() {
+                try {
+                    localStorage.setItem(CONFIG.storageKey, JSON.stringify(this.posts));
+                } catch (e) {
+                    console.error('保存帖子失败:', e);
+                    this.showError('保存失败，请稍后重试');
+                }
+            }
+
+            addPost(post) {
+                const newPost = {
+                    ...post,
+                    id: Date.now(),
+                    likes: 0,
+                    comments: [],
+                    liked: false
+                };
+                this.posts.unshift(newPost);
+                this.savePosts();
+                this.displayPosts();
+            }
+
+            validatePost(author, content) {
+                if (!author.trim()) {
+                    this.showError('请输入你的名字');
+                    return false;
+                }
+                if (!content.trim()) {
+                    this.showError('请输入分享内容');
+                    return false;
+                }
+                if (author.length > CONFIG.maxNameLength) {
+                    this.showError(`名字不能超过${CONFIG.maxNameLength}个字符`);
+                    return false;
+                }
+                if (content.length > CONFIG.maxContentLength) {
+                    this.showError(`内容不能超过${CONFIG.maxContentLength}个字符`);
+                    return false;
+                }
+                return true;
+            }
+
+            showError(message) {
+                const errorDiv = document.getElementById('charCount');
+                errorDiv.textContent = message;
+                setTimeout(() => errorDiv.textContent = '', 3000);
+            }
+
+            displayPosts() {
+                const container = document.getElementById('postsContainer');
+                if (this.posts.length === 0) {
+                    container.innerHTML = '<div class="no-posts">还没有人发帖，来做第一个分享心情的人吧！</div>';
+                    return;
+                }
+
+                container.innerHTML = this.posts.map(post => this.createPostHTML(post)).join('');
+            }
+
+            createPostHTML(post) {
+                const mood = CONFIG.moods[parseInt(post.mood)];
+                return `
+                    <div class="post">
+                        <div class="post-header">
+                            <span class="post-avatar">${CONFIG.avatars[parseInt(post.avatar)]}</span>
+                            <span class="post-author">${this.escapeHTML(post.author)}</span>
+                            <span class="post-mood" style="background: ${mood.color}">
+                                ${mood.emoji} ${mood.name}
+                            </span>
+                        </div>
+                        <div class="post-content">${this.escapeHTML(post.content)}</div>
+                        <div class="post-time">${post.time}</div>
+                        <div class="post-actions">
+                            <button class="action-button like-button" onclick="postManager.toggleLike(${post.id})" data-likes="${post.likes || 0}">
+                                ${post.liked ? '❤️' : '🤍'} ${post.likes || 0}
+                            </button>
+                            <button class="action-button comment-button" onclick="postManager.toggleComments(${post.id})">
+                                💬 ${(post.comments || []).length}
+                            </button>
+                            <button class="action-button" onclick="postManager.sharePost(${post.id})">
+                                🔗 分享
+                            </button>
+                            ${post.author === this.currentUser?.name ?
+                                `<button class="action-button delete-button" onclick="postManager.deletePost(${post.id})">
+                                    🗑️ 删除
+                                </button>` : ''}
+                        </div>
+                        <div id="comments-${post.id}" class="comments-section" style="display: none;">
+                            <div class="comments-list">
+                                ${(post.comments || []).map(comment => `
+                                    <div class="comment">
+                                        <span class="comment-author">${this.escapeHTML(comment.author)}</span>
+                                        <span class="comment-content">${this.escapeHTML(comment.content)}</span>
+                                        <span class="comment-time">${comment.time}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="comment-form">
+                                <input type="text" class="comment-input" placeholder="发表评论..." maxlength="${CONFIG.maxCommentLength}">
+                                <button onclick="postManager.addComment(${post.id}, this.previousElementSibling.value)">发送</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            generateOptions() {
+                // 生成头像选项
+                const avatarOptions = document.getElementById('avatarOptions');
+                avatarOptions.innerHTML = CONFIG.avatars.map((avatar, index) => `
+                    <label class="radio-label">
+                        <input type="radio" name="avatar" value="${index}" ${index === 0 ? 'checked' : ''}>
+                        ${avatar} ${this.getAvatarName(avatar)}
+                    </label>
+                `).join('');
+
+                // 生成心情选项
+                const moodOptions = document.getElementById('moodOptions');
+                moodOptions.innerHTML = CONFIG.moods.map((mood, index) => `
+                    <label class="radio-label" style="border-color: ${mood.color}">
+                        <input type="radio" name="mood" value="${index}" ${index === 0 ? 'checked' : ''}>
+                        ${mood.emoji} ${mood.name}
+                    </label>
+                `).join('');
+            }
+
+            getAvatarName(avatar) {
+                const avatarNames = {
+                    '😊': '微笑', '🐱': '猫咪', '🐼': '熊猫', '🦊': '狐狸',
+                    '🦄': '独角兽', '🤖': '机器人', '👻': '幽灵', '🌚': '面具',
+                    '🤡': '小丑', '👾': '外星人', '🎭': '戏精', '🥸': '伪装',
+                    '🦹': '反派', '🧙': '巫师', '🥷': '忍者', '👺': '天狗',
+                    '🪿': '鸭鸭', '🦩': '火烈鸟'
+                };
+                return avatarNames[avatar] || avatar;
+            }
+
+            loadUserPreferences() {
+                try {
+                    const prefs = localStorage.getItem(CONFIG.userPrefsKey);
+                    if (prefs) {
+                        this.currentUser = JSON.parse(prefs);
+                        document.documentElement.setAttribute('data-theme', this.currentUser.theme || CONFIG.defaultTheme);
+                    }
+                } catch (e) {
+                    console.error('加载用户偏好设置失败:', e);
+                }
+            }
+
+            saveUserPreferences() {
+                try {
+                    localStorage.setItem(CONFIG.userPrefsKey, JSON.stringify(this.currentUser));
+                } catch (e) {
+                    console.error('保存用户偏好设置失败:', e);
+                }
+            }
+
+            toggleTheme() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                if (this.currentUser) {
+                    this.currentUser.theme = newTheme;
+                    this.saveUserPreferences();
+                }
+            }
+
+            toggleLike(postId) {
+                const post = this.posts.find(p => p.id === postId);
+                if (post) {
+                    post.liked = !post.liked;
+                    post.likes = post.liked ? (post.likes || 0) + 1 : (post.likes || 1) - 1;
+                    this.savePosts();
+                    this.displayPosts();
+                }
+            }
+
+            toggleComments(postId) {
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                if (commentsSection) {
+                    const isVisible = commentsSection.style.display !== 'none';
+                    commentsSection.style.display = isVisible ? 'none' : 'block';
+                }
+            }
+
+            addComment(postId, content) {
+                if (!content.trim()) {
+                    this.showError('请输入评论内容');
+                    return;
+                }
+
+                const post = this.posts.find(p => p.id === postId);
+                if (post) {
+                    const comment = {
+                        author: this.currentUser?.name || '匿名用户',
+                        content: content,
+                        time: new Date().toLocaleString()
+                    };
+                    post.comments = post.comments || [];
+                    post.comments.push(comment);
+                    this.savePosts();
+                    this.displayPosts();
+                    this.toggleComments(postId); // 重新打开评论区
+                }
+            }
+
+            deletePost(postId) {
+                if (confirm('确定要删除这条动态吗？')) {
+                    this.posts = this.posts.filter(p => p.id !== postId);
+                    this.savePosts();
+                    this.displayPosts();
+                }
+            }
+
+            sharePost(postId) {
+                const post = this.posts.find(p => p.id === postId);
+                if (post) {
+                    const shareText = `${post.author}的心情：${post.content}`;
+                    if (navigator.share) {
+                        navigator.share({
+                            title: '分享心情',
+                            text: shareText,
+                            url: window.location.href
+                        }).catch(console.error);
+                    } else {
+                        // 复制到剪贴板
+                        navigator.clipboard.writeText(shareText).then(() => {
+                            alert('已复制到剪贴板');
+                        }).catch(console.error);
+                    }
+                }
+            }
+
+            filterPosts(filter) {
+                const now = new Date();
+                const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+
+                let filteredPosts = [...this.posts];
+
+                switch(filter) {
+                    case 'today':
+                        filteredPosts = this.posts.filter(post => new Date(post.time) >= startOfDay);
+                        break;
+                    case 'week':
+                        filteredPosts = this.posts.filter(post => new Date(post.time) >= startOfWeek);
+                        break;
+                    case 'hot':
+                        filteredPosts.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+                        break;
+                }
+
+                return filteredPosts;
+            }
+
+            setupEventListeners() {
+                // 生成选项
+                this.generateOptions();
+                const contentTextarea = document.getElementById('content');
+                contentTextarea.addEventListener('input', () => {
+                    const remaining = CONFIG.maxContentLength - contentTextarea.value.length;
+                    document.getElementById('charCount').textContent =
+                        `还可以输入 ${remaining} 个字符`;
+                });
+
+                document.getElementById('postButton').addEventListener('click', () => {
+                    const authorName = document.getElementById('authorName').value;
+                    const content = contentTextarea.value;
+                    const avatar = document.querySelector('input[name="avatar"]:checked').value;
+                    const mood = document.querySelector('input[name="mood"]:checked').value;
+
+                    if (this.validatePost(authorName, content)) {
+                        const post = {
+                            author: authorName,
+                            content: content,
+                            avatar: avatar,
+                            mood: mood,
+                            time: new Date().toLocaleString()
+                        };
+
+                        this.addPost(post);
+
+                        // 清空输入
+                        document.getElementById('authorName').value = '';
+                        contentTextarea.value = '';
+                        document.getElementById('charCount').textContent = '';
+                    }
+                });
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            new PostManager();
+        });
+    </script>
+</body>
+</html>
